@@ -22,7 +22,11 @@ func main() {
 	v4, _ := uuid.FromString("af282579-f8e7-4fd8-877c-183573de608b")
 	patient := pes.RebuildPatient(v4)
 
-	patient.ChangeName("Veit", "Osiander")
+	// patient.CreateId(uuid.NewV4())
+	// patient.ChangeName("Peter", "Mustermann")
+	patient.ExperiencePain("9")
 
 	pes.Persist(patient)
+
+	log.Println(patient)
 }
