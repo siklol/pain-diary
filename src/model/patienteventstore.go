@@ -52,7 +52,7 @@ func (pes *PatientEventStore) RebuildPatient(patientId uuid.UUID) *Patient {
 
 	for rows.Next() {
 		rows.Scan(&eventId, &eventData, &eventCreatedAt)
-		event = eventsourcing.NewEvent(eventId, eventData, eventCreatedAt, true)
+		event = eventsourcing.RebuildEvent(eventId, eventData, eventCreatedAt, true)
 		eventstream.Add(event)
 	}
 

@@ -13,7 +13,14 @@ type Event struct {
 	isPersisted bool
 }
 
-func NewEvent(eventId uuid.UUID, s string, createdAt time.Time, isPersisted bool) Event {
+func NewEvent(eventId uuid.UUID, eventData map[string]interface{}) Event {
+	e := Event{id: eventId, createdAt: time.Now(), isPersisted: false}
+	e.payload = eventData
+
+	return e
+}
+
+func RebuildEvent(eventId uuid.UUID, s string, createdAt time.Time, isPersisted bool) Event {
 	payload := []byte(s)
 	var f map[string]interface{}
 	e := Event{id: eventId}

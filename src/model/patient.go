@@ -2,7 +2,6 @@ package patient
 
 import (
 	"eventsourcing"
-	"fmt"
 	"github.com/satori/go.uuid"
 	"time"
 )
@@ -28,14 +27,22 @@ func (patient *Patient) CreateId(patientId uuid.UUID) {
 	patient.patientId = patientId
 	patient.createdAt = time.Now()
 
-	eventData := fmt.Sprintf("{\"name\": \"Event.CreateId\", \"patientId\": \"%s\", \"createdAt\": \"%s\"}", patientId, patient.createdAt.String())
-	patient.change(eventsourcing.NewEvent(uuid.NewV4(), eventData, time.Now(), false))
+	eventData := map[string]interface{} {
+		"name": "Event.CreateId",
+		"patientId": patientId.String(),
+		"createdAt": patient.createdAt.String(),
+	}
+	patient.change(eventsourcing.NewEvent(uuid.NewV4(), eventData))
 }
 
 func (patient *Patient) ChangeName(firstname string, lastname string) {
 	patient.firstname = firstname
 	patient.lastname = lastname
 
-	eventData := fmt.Sprintf("{\"name\": \"Event.ChangeName\", \"firstname\": \"%s\", \"lastname\": \"%s\"}", patient.firstname, patient.lastname)
-	patient.change(eventsourcing.NewEvent(uuid.NewV4(), eventData, time.Now(), false))
+	eventData := map[string]interface{} {
+		"name": "Event.ChangeName",
+		"firstname": patient.firstname,
+		"lastname": patient.lastname,
+	}
+	patient.change(eventsourcing.NewEvent(uuid.NewV4(), eventData))
 }
