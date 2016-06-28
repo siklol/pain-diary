@@ -1,7 +1,7 @@
 package main
 
 import (
-	"../src/model"
+	"../src/customer"
 	"database/sql"
 	"fmt"
 	"log"
@@ -10,23 +10,29 @@ import (
 	"github.com/satori/go.uuid"
 )
 
+const (
+	DATABASE_NAME     = "rbl"
+	DATABASE_USER     = "rbl"
+	DATABASE_PASSWORD = "rbl"
+)
+
 func main() {
-	db, err := sql.Open("postgres", fmt.Sprintf("user=%s dbname=%s password=%s sslmode=%s", "test", "test", "test123", "disable"))
+	db, err := sql.Open("postgres", fmt.Sprintf("user=%s dbname=%s password=%s sslmode=%s", DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, "disable"))
 	defer db.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	pes := patient.CreateEventStore(db)
+	pes := customer.CreateEventStore(db)
 
 	v4, _ := uuid.FromString("af282579-f8e7-4fd8-877c-183573de608b")
-	patient := pes.RebuildPatient(v4)
+	customer := pes.RebuildCustomer(v4)
 
-	// patient.CreateId(uuid.NewV4())
-	// patient.ChangeName("Peter", "Mustermann")
-	patient.ExperiencePain("9")
+	// customer.CreateId(uuid.NewV4())
+	// customer.ChangeName("Peter", "Mustermann")
+	customer.ExperiencePain("9")
 
-	pes.Persist(patient)
+	pes.Persist(customer)
 
-	log.Println(patient)
+	log.Println(customer)
 }

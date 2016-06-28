@@ -7,9 +7,9 @@ import (
 )
 
 type Event struct {
-	id        uuid.UUID
-	payload   map[string]interface{}
-	createdAt time.Time
+	id          uuid.UUID
+	payload     map[string]interface{}
+	createdAt   time.Time
 	isPersisted bool
 }
 

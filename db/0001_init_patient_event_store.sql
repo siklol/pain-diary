@@ -1,8 +1,8 @@
-CREATE TABLE public.patienteventstore
+CREATE TABLE public.customereventstore
 (
   eventid UUID PRIMARY KEY NOT NULL,
-  patientid UUID NOT NULL,
+  customerid UUID NOT NULL,
   eventdata JSONB DEFAULT '{}' NOT NULL,
   createdat TIMESTAMPTZ NOT NULL
 );
-CREATE UNIQUE INDEX patienteventstore_eventid_uindex ON public.patienteventstore (eventid);
+CREATE UNIQUE INDEX customereventstore_eventid_uindex ON public.customereventstore (eventid);
