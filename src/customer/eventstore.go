@@ -40,7 +40,9 @@ func (pes *EventStore) Persist(stream *eventsourcing.EventStream) {
 }
 
 func (pes *EventStore) CreateCustomer(customerId uuid.UUID) *Customer {
-	return &Customer{}
+	c := Customer{}
+	c.Replay(eventsourcing.NewStream())
+	return &c
 }
 
 func (pes *EventStore) RebuildCustomer(customerId uuid.UUID) *Customer {
