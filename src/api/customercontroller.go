@@ -13,14 +13,6 @@ type CustomerController struct {
 	DB *sql.DB
 }
 
-func error(w http.ResponseWriter, errorMessage string) {
-	result, _ := json.Marshal(map[string]interface{}{
-		"error": errorMessage,
-	})
-
-	w.Write(result)
-}
-
 // Creates a new customer and returns a uuid
 func (controller *CustomerController) Create(w http.ResponseWriter, r *http.Request) {
 	var (
@@ -64,7 +56,7 @@ func (controller *CustomerController) UpdateProfile(w http.ResponseWriter, r *ht
 	pes = customer.CreateEventStore(controller.DB)
 
 	if r.FormValue("customerId") == "" {
-		error(w, "Customer not found! Customer ID not provided.")
+		Error(w, "Customer not found! Customer ID not provided.")
 		return
 	}
 
