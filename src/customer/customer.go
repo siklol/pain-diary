@@ -58,23 +58,23 @@ func (customer *Customer) Stream() []eventsourcing.Event {
 }
 
 func (customer *Customer) CreateId(customerId uuid.UUID) {
-	customer.apply(eventsourcing.NewEvent(uuid.NewV4(), map[string]interface{}{
+	customer.apply(eventsourcing.NewEvent(customerId, uuid.NewV4(), map[string]interface{}{
 		"name":       "Event.CreateId",
 		"customerId": customerId.String(),
-		"createdAt":  customer.createdAt.String(),
+		"createdAt":  time.Now().String(),
 	}))
 }
 
 func (customer *Customer) ChangeName(firstname string, lastname string) {
-	customer.apply(eventsourcing.NewEvent(uuid.NewV4(), map[string]interface{}{
+	customer.apply(eventsourcing.NewEvent(customer.customerId, uuid.NewV4(), map[string]interface{}{
 		"name":      "Event.ChangeName",
-		"firstname": customer.firstname,
-		"lastname":  customer.lastname,
+		"firstname": firstname,
+		"lastname":  lastname,
 	}))
 }
 
 func (customer *Customer) ExperiencePain(pain string) {
-	customer.apply(eventsourcing.NewEvent(uuid.NewV4(), map[string]interface{}{
+	customer.apply(eventsourcing.NewEvent(customer.customerId, uuid.NewV4(), map[string]interface{}{
 		"name": "Event.ExperiencePain",
 		"pain": pain,
 	}))

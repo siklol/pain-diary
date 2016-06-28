@@ -8,29 +8,34 @@ import (
 
 type Event struct {
 	id          uuid.UUID
+	customerId  uuid.UUID
 	payload     map[string]interface{}
 	createdAt   time.Time
 	isPersisted bool
 }
 
-func NewEvent(eventId uuid.UUID, eventData map[string]interface{}) Event {
-	e := Event{id: eventId, createdAt: time.Now(), isPersisted: false}
-	e.payload = eventData
-
-	return e
+func NewEvent(customerId uuid.UUID, eventId uuid.UUID, eventData map[string]interface{}) Event {
+	return Event{
+		id: eventId,
+		customerId: customerId,
+		createdAt: time.Now(),
+		isPersisted: false,
+		payload: eventData,
+	}
 }
 
-func RebuildEvent(eventId uuid.UUID, s string, createdAt time.Time, isPersisted bool) Event {
+func RebuildEvent(customerId uuid.UUID, eventId uuid.UUID, s string, createdAt time.Time, isPersisted bool) Event {
 	payload := []byte(s)
-	var f map[string]interface{}
-	e := Event{id: eventId}
+	var payloadJson map[string]interface{}
+	json.Unmarshal(payload, &payloadJson)
 
-	json.Unmarshal(payload, &f)
-	e.payload = f
-	e.createdAt = createdAt
-	e.isPersisted = isPersisted
-
-	return e
+	return Event{
+		id: eventId,
+		customerId: customerId,
+		createdAt: createdAt,
+		isPersisted: isPersisted,
+		payload: payloadJson,
+	}
 }
 
 func (e *Event) Payload() map[string]interface{} {
@@ -39,6 +44,10 @@ func (e *Event) Payload() map[string]interface{} {
 
 func (e *Event) Id() uuid.UUID {
 	return e.id
+}
+
+func (e *Event) CustomerId() uuid.UUID {
+	return e.customerId
 }
 
 func (e *Event) CreatedAt() time.Time {

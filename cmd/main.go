@@ -28,8 +28,8 @@ func main() {
 	v4, _ := uuid.FromString("af282579-f8e7-4fd8-877c-183573de608b")
 	customer := pes.RebuildCustomer(v4)
 
-	// customer.CreateId(uuid.NewV4())
-	// customer.ChangeName("Peter", "Mustermann")
+	customer.CreateId(v4)
+	customer.ChangeName("Peter", "Mustermann")
 	customer.ExperiencePain("9")
 
 	pes.Persist(customer)
