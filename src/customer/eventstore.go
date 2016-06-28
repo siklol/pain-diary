@@ -7,6 +7,7 @@ import (
 	"github.com/satori/go.uuid"
 	"log"
 	"time"
+	"errors"
 )
 
 var (
@@ -38,29 +39,44 @@ func (pes *EventStore) Persist(stream *eventsourcing.EventStream) {
 	}
 }
 
+func (pes *EventStore) CreateCustomer(customerId uuid.UUID) *Customer {
+	return &Customer{}
+}
+
 func (pes *EventStore) RebuildCustomer(customerId uuid.UUID) *Customer {
-	rows, err := pes.db.Query(selectQuery, customerId.String())
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	var (
 		eventId        uuid.UUID
 		eventData      string
 		event          eventsourcing.Event
 		eventCreatedAt time.Time
+		eventstream    *eventsourcing.EventStream
+		customer       Customer
+		rows           *sql.Rows
+		err            error
+		customerExists bool
 	)
 
-	eventstream := eventsourcing.NewStream()
+	rows, err = pes.db.Query(selectQuery, customerId.String())
+	defer rows.Close()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	eventstream = eventsourcing.NewStream()
 
 	for rows.Next() {
 		rows.Scan(&eventId, &eventData, &eventCreatedAt)
 		event = eventsourcing.RebuildEvent(customerId, eventId, eventData, eventCreatedAt, true)
 		eventstream.Add(event)
+		customerExists = true
 	}
 
-	customer := Customer{}
+	if customerExists == false {
+		errors.New("Customer does not exist")
+	}
+
+	customer = Customer{}
 	customer.Replay(eventstream)
 
 	return &customer

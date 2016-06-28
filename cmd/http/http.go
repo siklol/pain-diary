@@ -1,11 +1,11 @@
 package main
 
 import (
+	"api"
 	"database/sql"
-	"net/http"
 	"fmt"
 	"log"
-	"api"
+	"net/http"
 
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
@@ -29,6 +29,7 @@ func main() {
 
 	router := mux.NewRouter()
 	router.HandleFunc("/customer/create", customerController.Create).Methods("POST")
+	router.HandleFunc("/customer/profile/update", customerController.UpdateProfile).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(SERVER_PORT, router))
 }
