@@ -30,6 +30,7 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/customer/create", customerController.Create).Methods("POST")
 	router.HandleFunc("/customer/profile/update", customerController.UpdateProfile).Methods("POST")
+	router.HandleFunc("/customer/pain", customerController.ExperiencePain).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(SERVER_PORT, router))
 }

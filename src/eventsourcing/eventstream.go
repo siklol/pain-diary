@@ -1,9 +1,5 @@
 package eventsourcing
 
-import (
-	"log"
-)
-
 type EventStream struct {
 	stream []Event
 }
@@ -19,7 +15,6 @@ func (es *EventStream) Stream() []Event {
 }
 
 func (es *EventStream) Add(e Event) {
-	log.Println(e)
 	es.stream = append(es.stream, e)
 }
 

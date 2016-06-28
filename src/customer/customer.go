@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/satori/go.uuid"
+	"strconv"
 )
 
 type Customer struct {
@@ -15,7 +16,7 @@ type Customer struct {
 	firstname  string
 	lastname   string
 	createdAt  time.Time
-	pain       string
+	pain       []int64
 }
 
 func (customer *Customer) Replay(eventStream *eventsourcing.EventStream) {
@@ -48,7 +49,8 @@ func (customer *Customer) mutate() {
 			customer.lastname = e.Payload()["lastname"].(string)
 			break
 		case e.Name() == "Event.ExperiencePain":
-			customer.pain = e.Payload()["pain"].(string)
+			i, _ := strconv.ParseInt(e.Payload()["pain"].(string), 10, 64)
+			customer.pain = append(customer.pain, i)
 			break
 		}
 	}

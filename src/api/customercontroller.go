@@ -3,10 +3,11 @@ package api
 import (
 	"customer"
 	"database/sql"
-	"encoding/json"
 	"net/http"
+	"fmt"
 
 	"github.com/satori/go.uuid"
+	"log"
 )
 
 type CustomerController struct {
@@ -16,7 +17,6 @@ type CustomerController struct {
 // Creates a new customer and returns a uuid
 func (controller *CustomerController) Create(w http.ResponseWriter, r *http.Request) {
 	var (
-		result     []byte
 		customerId uuid.UUID
 		pes        *customer.EventStore
 		c          *customer.Customer
@@ -36,18 +36,14 @@ func (controller *CustomerController) Create(w http.ResponseWriter, r *http.Requ
 	c.CreateId(customerId)
 
 	pes.Persist(c.Stream())
-	result, _ = json.Marshal(map[string]interface{}{
+	Success(w, map[string]interface{}{
 		"customerId": customerId.String(),
-		"error":      "",
 	})
-
-	w.Write(result)
 }
 
 // Updates customer profile
 func (controller *CustomerController) UpdateProfile(w http.ResponseWriter, r *http.Request) {
 	var (
-		result     []byte
 		customerId uuid.UUID
 		pes        *customer.EventStore
 		c          *customer.Customer
@@ -59,15 +55,52 @@ func (controller *CustomerController) UpdateProfile(w http.ResponseWriter, r *ht
 		Error(w, "Customer not found! Customer ID not provided.")
 		return
 	}
+	customerId, _ = uuid.FromString(r.FormValue("customerId"))
+
+	if r.FormValue("firstname") == "" || r.FormValue("lastname") == "" {
+		Error(w, "Firstname or lastname not found!")
+		return
+	}
 
 	c = pes.RebuildCustomer(customerId)
-	c.CreateId(customerId)
+	c.ChangeName(r.FormValue("firstname"), r.FormValue("lastname"))
 
 	pes.Persist(c.Stream())
-	result, _ = json.Marshal(map[string]interface{}{
-		"customerId": customerId.String(),
-		"error":      "",
+	Success(w, map[string]interface{}{
+		"message": "Update customer profile",
+	})
+}
+
+// Adds a pain level
+func (controller *CustomerController) ExperiencePain(w http.ResponseWriter, r *http.Request) {
+	var (
+		customerId uuid.UUID
+		pain string
+		pes        *customer.EventStore
+		c          *customer.Customer
+	)
+
+	pes = customer.CreateEventStore(controller.DB)
+
+	if r.FormValue("customerId") == "" {
+		Error(w, "Customer not found! Customer ID not provided.")
+		return
+	}
+	customerId, _ = uuid.FromString(r.FormValue("customerId"))
+
+	pain = r.FormValue("pain")
+	if pain == "" {
+		Error(w, "Pain not provided.")
+		return
+	}
+
+	c = pes.RebuildCustomer(customerId)
+	c.ExperiencePain(pain)
+
+	pes.Persist(c.Stream())
+	Success(w, map[string]interface{}{
+		"message": fmt.Sprintf("Pain %s was logged", pain),
 	})
 
-	w.Write(result)
+	log.Println(c)
 }

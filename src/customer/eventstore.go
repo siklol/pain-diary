@@ -3,11 +3,11 @@ package customer
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"eventsourcing"
 	"github.com/satori/go.uuid"
 	"log"
 	"time"
-	"errors"
 )
 
 var (
