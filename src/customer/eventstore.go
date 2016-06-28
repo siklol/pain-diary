@@ -14,16 +14,16 @@ var (
 	selectQuery = "SELECT eventid, eventdata, createdat FROM customereventstore WHERE customerid = $1 ORDER BY createdat"
 )
 
-type CustomerEventStore struct {
+type EventStore struct {
 	db *sql.DB
 }
 
-func CreateEventStore(database *sql.DB) *CustomerEventStore {
-	return &CustomerEventStore{db: database}
+func CreateEventStore(database *sql.DB) *EventStore {
+	return &EventStore{db: database}
 }
 
-func (pes *CustomerEventStore) Persist(customer *Customer) {
-	for _, event := range customer.Stream() {
+func (pes *EventStore) Persist(stream *eventsourcing.EventStream) {
+	for _, event := range stream.Stream() {
 		if !event.IsPersisted() {
 			s, _ := json.Marshal(event.Payload())
 			eventId := event.Id().String()
@@ -38,7 +38,7 @@ func (pes *CustomerEventStore) Persist(customer *Customer) {
 	}
 }
 
-func (pes *CustomerEventStore) RebuildCustomer(customerId uuid.UUID) *Customer {
+func (pes *EventStore) RebuildCustomer(customerId uuid.UUID) *Customer {
 	rows, err := pes.db.Query(selectQuery, customerId.String())
 
 	if err != nil {

@@ -2,9 +2,10 @@ package customer
 
 import (
 	"eventsourcing"
-	"github.com/satori/go.uuid"
 	"log"
 	"time"
+
+	"github.com/satori/go.uuid"
 )
 
 type Customer struct {
@@ -53,8 +54,8 @@ func (customer *Customer) mutate() {
 	}
 }
 
-func (customer *Customer) Stream() []eventsourcing.Event {
-	return customer.eventStream.Stream()
+func (customer *Customer) Stream() *eventsourcing.EventStream {
+	return customer.eventStream
 }
 
 func (customer *Customer) CreateId(customerId uuid.UUID) {

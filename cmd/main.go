@@ -23,6 +23,9 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// TODO remove debug
+	db.Exec("TRUNCATE customereventstore;")
+
 	pes := customer.CreateEventStore(db)
 
 	v4, _ := uuid.FromString("af282579-f8e7-4fd8-877c-183573de608b")
@@ -32,7 +35,7 @@ func main() {
 	customer.ChangeName("Peter", "Mustermann")
 	customer.ExperiencePain("9")
 
-	pes.Persist(customer)
+	pes.Persist(customer.Stream())
 
 	log.Println(customer)
 }
