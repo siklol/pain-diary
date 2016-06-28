@@ -2,19 +2,20 @@ package main
 
 import (
 	"database/sql"
+	"net/http"
 	"fmt"
 	"log"
-
 	"api"
+
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
-	"net/http"
 )
 
 const (
 	DATABASE_NAME     = "rbl"
 	DATABASE_USER     = "rbl"
 	DATABASE_PASSWORD = "rbl"
+	SERVER_PORT       = ":8080"
 )
 
 func main() {
@@ -27,8 +28,7 @@ func main() {
 	customerController := api.CustomerController{db}
 
 	router := mux.NewRouter()
-	router.HandleFunc("/", customerController.Index)
 	router.HandleFunc("/customer/create", customerController.Create).Methods("POST")
 
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe(SERVER_PORT, router))
 }

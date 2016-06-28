@@ -12,24 +12,23 @@ type CustomerController struct {
 	DB *sql.DB
 }
 
-func (controller *CustomerController) Index(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("This is a test"))
-}
-
+// Creates a new customer and returns a uuid
 func (controller *CustomerController) Create(w http.ResponseWriter, r *http.Request) {
 	var (
 		result     []byte
 		customerId uuid.UUID
 		pes        *customer.EventStore
-		c          customer.Customer
+		c          *customer.Customer
 	)
+
+	// TODO add query filter for customer id uniqueness
 
 	pes = customer.CreateEventStore(controller.DB)
 
 	if r.FormValue("customerId") != "" {
 		customerId, _ = uuid.FromString(r.FormValue("customerId"))
 	} else {
-		customerId, _ = uuid.NewV4()
+		customerId = uuid.NewV4()
 	}
 
 	c = pes.RebuildCustomer(customerId)
