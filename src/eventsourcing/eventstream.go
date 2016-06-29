@@ -10,7 +10,7 @@ func NewStream() *EventStream {
 	return &EventStream{stream: stream}
 }
 
-func (es *EventStream) Stream() []Event {
+func (es *EventStream) Events() []Event {
 	return es.stream
 }
 

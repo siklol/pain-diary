@@ -32,7 +32,7 @@ func (customer *Customer) apply(event eventsourcing.Event) {
 }
 
 func (customer *Customer) mutate() {
-	stream := customer.eventStream.Stream()
+	stream := customer.eventStream.Events()
 	var err error
 
 	for _, e := range stream {

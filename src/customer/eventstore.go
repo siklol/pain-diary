@@ -24,7 +24,7 @@ func CreateEventStore(database *sql.DB) *EventStore {
 }
 
 func (pes *EventStore) Persist(stream *eventsourcing.EventStream) {
-	for _, event := range stream.Stream() {
+	for _, event := range stream.Events() {
 		if !event.IsPersisted() {
 			s, _ := json.Marshal(event.Payload())
 			eventId := event.Id().String()
@@ -39,47 +39,42 @@ func (pes *EventStore) Persist(stream *eventsourcing.EventStream) {
 	}
 }
 
-func (pes *EventStore) CreateCustomer(customerId uuid.UUID) *Customer {
+func (pes *EventStore) Create(aggregateId uuid.UUID) *Customer {
 	c := Customer{}
 	c.Replay(eventsourcing.NewStream())
 	return &c
 }
 
-func (pes *EventStore) RebuildCustomer(customerId uuid.UUID) *Customer {
-	var (
-		eventId        uuid.UUID
-		eventData      string
-		event          eventsourcing.Event
-		eventCreatedAt time.Time
-		eventstream    *eventsourcing.EventStream
-		customer       Customer
-		rows           *sql.Rows
-		err            error
-		customerExists bool
-	)
-
-	rows, err = pes.db.Query(selectQuery, customerId.String())
+func (pes *EventStore) Rebuild(aggregate uuid.UUID) (*Customer, error) {
+	rows, err := pes.db.Query(selectQuery, aggregate.String())
 	defer rows.Close()
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	eventstream = eventsourcing.NewStream()
+	eventstream := eventsourcing.NewStream()
+
+	var (
+		eventId         uuid.UUID
+		eventData       string
+		eventCreatedAt  time.Time
+		aggregateExists bool
+	)
 
 	for rows.Next() {
 		rows.Scan(&eventId, &eventData, &eventCreatedAt)
-		event = eventsourcing.RebuildEvent(customerId, eventId, eventData, eventCreatedAt, true)
+		event := eventsourcing.RebuildEvent(aggregate, eventId, eventData, eventCreatedAt, true)
 		eventstream.Add(event)
-		customerExists = true
+		aggregateExists = true
 	}
 
-	if customerExists == false {
-		errors.New("Customer does not exist")
+	if aggregateExists == false {
+		err = errors.New("Customer does not exist")
 	}
 
-	customer = Customer{}
+	customer := Customer{}
 	customer.Replay(eventstream)
 
-	return &customer
+	return &customer, err
 }
